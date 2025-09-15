@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage - Tool Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+        <header class="mb-6 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Manage Tools & Borrowers</h1>
+            <a href="{{ url_for('dashboard') }}" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-colors duration-300">
+                &larr; Back to Dashboard
+            </a>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-4">
+                {% for category, message in messages %}
+                    <div class="p-4 rounded-lg 
+                        {% if category == 'success' %} bg-green-100 text-green-800 
+                        {% elif category == 'error' %} bg-red-100 text-red-800 
+                        {% else %} bg-blue-100 text-blue-800 
+                        {% endif %}" 
+                        role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Add New Items Column -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Add Category -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Category</h2>
+                    <form action="{{ url_for('add_category') }}" method="POST">
+                        <input type="text" name="category_name" placeholder="e.g., Power Tools" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-600">Add Category</button>
+                    </form>
+                </div>
+                <!-- Add Tool -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Tool</h2>
+                    <!-- MODIFIED: Added enctype for file uploads -->
+                    <form action="{{ url_for('add_tool') }}" method="POST" enctype="multipart/form-data">
+                        <div class="space-y-3">
+                            <input type="text" name="tool_name" placeholder="e.g., Bosch Drill" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select name="category_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="" disabled selected>Select a category...</option>
+                                {% for category in all_categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <!-- NEW: File input for image -->
+                            <div>
+                                <label for="tool_image" class="block text-sm font-medium text-gray-700 mb-1">Tool Image (Optional)</label>
+                                <input type="file" name="tool_image" id="tool_image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-600">Add Tool</button>
+                    </form>
+                </div>
+                 <!-- Add Borrower -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Borrower</h2>
+                    <form action="{{ url_for('add_borrower') }}" method="POST">
+                         <div class="space-y-3">
+                            <input type="text" name="borrower_name" placeholder="Borrower Name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="email" name="email" placeholder="Email (Optional)" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="tel" name="phone" placeholder="Phone Number (e.g. 9876543210)" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                             <select name="contact_method" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="None" selected>No Reminders</option>
+                                <option value="Email">Email</option>
+                                <option value="SMS">SMS</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-600">Add Borrower</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- View Existing Items Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Tool List -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">All Tools</h2>
+                    <div class="overflow-auto max-h-96">
+                        <table class="min-w-full divide-y divide-gray-200">
+                           <!-- ... table header ... -->
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for tool in all_tools %}
+                                <tr>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ tool.name }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{{ tool.category.name }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                    <img src="{{ url_for('uploaded_file', filename=tool.image_file) }}" alt="{{ tool.name }}" class="h-10 w-10 object-cover rounded-md">
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                        <!-- THIS IS THE FIX: A form is used to send a POST request -->
+                                        <form action="{{ url_for('delete_tool', tool_id=tool.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this tool? This action cannot be undone.');">
+                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Borrower List -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">All Borrowers</h2>
+                    <div class="overflow-auto max-h-96">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for borrower in all_borrowers %}
+                                <tr>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{{ borrower.name }}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                        {{ borrower.contact_method }}
+                                    </td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                        <a href="{{ url_for('edit_borrower', borrower_id=borrower.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

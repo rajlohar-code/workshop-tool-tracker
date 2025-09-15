@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Borrower - Tool Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+        <header class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Edit Borrower: {{ borrower.name }}</h1>
+        </header>
+
+        <main>
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-lg mx-auto">
+                <form action="{{ url_for('edit_borrower', borrower_id=borrower.id) }}" method="POST">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="borrower_name" class="block text-sm font-medium text-gray-700 mb-1">Borrower Name</label>
+                            <input type="text" id="borrower_name" name="borrower_name" value="{{ borrower.name }}" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <input type="email" id="email" name="email" value="{{ borrower.email or '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" value="{{ borrower.phone_number or '' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="contact_method" class="block text-sm font-medium text-gray-700 mb-1">Preferred Contact</label>
+                            <select id="contact_method" name="contact_method" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="None" {% if borrower.contact_method == 'None' %}selected{% endif %}>None</option>
+                                <option value="Email" {% if borrower.contact_method == 'Email' %}selected{% endif %}>Email</option>
+                                <option value="SMS" {% if borrower.contact_method == 'SMS' %}selected{% endif %}>SMS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex space-x-4">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-colors duration-300">
+                            Save Changes
+                        </button>
+                        <a href="{{ url_for('manage') }}" class="flex-1 text-center bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg shadow hover:bg-gray-300 transition-colors duration-300">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
