@@ -310,10 +310,11 @@ def create_app():
     return app
 
 # --- CREATE APP INSTANCE ---
-app = create_app()
+ 
 
 # --- RUN BLOCK FOR LOCAL TESTING ---
 if __name__ == '__main__':
+    app = create_app()
     with app.app_context():
         db.create_all()
     app.run(debug=True, use_reloader=False, host='0.0.0.0')
