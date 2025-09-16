@@ -11,6 +11,9 @@ from sqlalchemy import or_
 from datetime import datetime, date, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
+import psycopg2
+
+
 
 # Load environment variables from a .env file
 load_dotenv()
