@@ -161,11 +161,15 @@ def create_app():
         os.makedirs(UPLOAD_FOLDER)
 
     DATABASE_URL = os.environ.get('DATABASE_URL')
+    print(f"--- DIAGNOSTIC: DATABASE_URL from environment is: {DATABASE_URL} ---")
     if DATABASE_URL:
        # THE FIX: This new logic reliably handles the postgresql URL.
-        if DATABASE_URL.startswith("postgres://"):
-            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-            app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+        # This new logic reliably handles the postgresql URL and strips whitespace.
+        db_url = DATABASE_URL.strip()
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+            app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+            print(f"--- DIAGNOSTIC: Using production DATABASE_URL: {db_url} ---")
         else:
             DB_USER = 'root'
             DB_PASSWORD = 'raj@mysql' # YOUR LOCAL PASSWORD
