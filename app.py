@@ -189,6 +189,11 @@ def create_app():
 
     # --- INITIALIZE EXTENSIONS ---
     db.init_app(app)
+     # --- THIS IS THE FINAL FIX ---
+    # This block of code tells the app to create the database tables
+    # if they don't already exist. This is crucial for the first-time deployment.
+    with app.app_context():
+        db.create_all()
 
     # --- REGISTER ROUTES ---
     @app.route('/')
