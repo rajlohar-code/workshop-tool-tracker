@@ -165,17 +165,22 @@ def create_app():
     if DATABASE_URL:
        # THE FIX: This new logic reliably handles the postgresql URL.
         # This new logic reliably handles the postgresql URL and strips whitespace.
+        # db_url = DATABASE_URL.strip()
+        # if db_url.startswith("postgres://"):
+        #     db_url = db_url.replace("postgres://", "postgresql://", 1)
+        #     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+        #     print(f"--- DIAGNOSTIC: Using production DATABASE_URL: {db_url} ---")
+        # Based on the diagnostic log, we know the URL is in the correct format.
+        # We will now use it directly after stripping any potential whitespace.
         db_url = DATABASE_URL.strip()
-        if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql://", 1)
-            app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-            print(f"--- DIAGNOSTIC: Using production DATABASE_URL: {db_url} ---")
-        else:
-            DB_USER = 'root'
-            DB_PASSWORD = 'raj@mysql' # YOUR LOCAL PASSWORD
-            DB_HOST = 'localhost'
-            DB_NAME = 'tools_db' # YOUR LOCAL DB NAME
-            app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql:/root:raj%40mysql@localhost/tools_db"
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+        print(f"--- DIAGNOSTIC: Using production DATABASE_URL: {db_url} ---")
+    else:
+        DB_USER = 'root'
+        DB_PASSWORD = 'raj@mysql' # YOUR LOCAL PASSWORD
+        DB_HOST = 'localhost'
+        DB_NAME = 'tools_db' # YOUR LOCAL DB NAME
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql:/root:raj%40mysql@localhost/tools_db"
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
