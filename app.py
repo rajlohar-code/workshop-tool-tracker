@@ -162,13 +162,16 @@ def create_app():
 
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if DATABASE_URL:
-        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("://", "ql://", 1)
-    else:
-        DB_USER = 'root'
-        DB_PASSWORD = 'raj@mysql' # YOUR LOCAL PASSWORD
-        DB_HOST = 'localhost'
-        DB_NAME = 'tools_db' # YOUR LOCAL DB NAME
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql:/root:raj%40mysql@localhost/tools_db"
+       # THE FIX: This new logic reliably handles the postgresql URL.
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+            app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+        else:
+            DB_USER = 'root'
+            DB_PASSWORD = 'raj@mysql' # YOUR LOCAL PASSWORD
+            DB_HOST = 'localhost'
+            DB_NAME = 'tools_db' # YOUR LOCAL DB NAME
+            app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql:/root:raj%40mysql@localhost/tools_db"
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
