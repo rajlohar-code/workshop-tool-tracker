@@ -212,7 +212,7 @@ def create_app():
     def uploaded_file(filename):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-    @app.route('/trigger_reminders')
+    @app.route('/trigger_reminders',methods=['GET','POST'])
     def trigger_reminders():
         send_reminders(app)
         flash("Manual reminder check has been triggered.", "info")
